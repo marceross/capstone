@@ -1,0 +1,19 @@
+{% extends "booking/layout.html" %}
+
+{% block body %}
+
+<h2>Activitys from Users You Follow</h2>
+{% if activitys %}
+  <ul>
+    {% for activity in activitys %}
+      <li>
+        {{ activity.activity }} by {{ activity.created_by }}
+        <br>
+        Likes: {{ activity.likes.count }}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No activitys available.</p>
+{% endif %}
+{% endblock %}

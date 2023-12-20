@@ -1,0 +1,25 @@
+{% extends "booking/layout.html" %}
+
+{% block body %}
+<h1>{{ username }}'s Profile</h1>
+<p>Followers: {{ user_profile.followers.count }}</p>
+<p>Following: {{ user_profile.following_users.count }}</p>
+
+<h2>Activitys:</h2>
+{% for activity in activitys %}
+    <p>{{ activity }}</p>
+{% endfor %}
+
+<form method="POST" action="{% url 'booking:follow_profile' %}">
+    {% csrf_token %}
+    <input type="hidden" name="created_by" value="{{ username }}">
+    <button type="submit" name="add_follow" value="1" class="btn {% if followed %}btn-danger{% else %}btn-info{% endif %} mt-2 ml-2">
+        {% if not followed %}
+            Follow
+        {% else %}
+            Unfollow
+        {% endif %}
+    </button>
+</form>
+
+{% endblock %}
