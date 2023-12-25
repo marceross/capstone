@@ -20,12 +20,14 @@
                     </li>
                 {% endif %}
                 <li class="nav-item">
-                  <a class="nav-link" href="{% url 'booking:allactivitys' %}">All Activitys</a>
+                  <a class="nav-link" href="{% url 'booking:all_activities' %}">All Activities</a>
                 </li>
                 {% if user.is_authenticated %}
+                    {% comment %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'booking:following' %}">Following</a>
                     </li>
+                    {% endcomment %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'booking:logout' %}">Log Out</a>
                     </li>

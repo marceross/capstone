@@ -11,7 +11,9 @@ urlpatterns = [
     path("register", views.register, name="register"),
 
 
-    path("activitys", views.all_activitys, name="allactivitys"),
+    path("activities", views.all_activities, name="all_activities"),
+    path("activities/<int:activity_id>", views.activity, name="activity"),
+    path("schedules/<int:schedule_id>", views.schedule, name="schedule"),
 
     path("create_activity", views.create_activity, name="create"),
     path('profile/<str:username>', views.user_profile_view, name='profile'),

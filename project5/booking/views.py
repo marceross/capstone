@@ -1,12 +1,12 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404,redirect
 from django.urls import reverse
 
 from django import forms
 
-from .models import User, UserProfile, Activity
+from .models import ActivitySchedule, User, UserProfile, Activity
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 
@@ -102,17 +102,46 @@ def all_activitys(request):
         return render(request, 'booking/allactivitys.html', {'activitys': activitys})
 '''
 
-def all_activitys(request):
-    activitys = Activity.objects.all().order_by('-created_date')
-    paginator = Paginator(activitys, 5)
+def all_activities(request):
+    activities = Activity.objects.all()
+    paginator = Paginator(activities, 5)
     if request.GET.get("page") != None:
         try:
-            activitys = paginator.page(request.GET.get("page"))
+            activities = paginator.page(request.GET.get("page"))
         except:
-            activitys = paginator.page(1)
+            activities = paginator.page(1)
     else:
-        activitys = paginator.page(1)
-    return render(request, 'booking/allactivitys.html', {'activitys': activitys})
+        activities = paginator.page(1)
+    return render(request, 'booking/all_activities.html', {'activities': activities})
+
+def activity(request, activity_id):
+    try:
+        activity = Activity.objects.get(pk=activity_id)
+    except activity.DoesNotExist:
+        raise Http404("Activity not found.")
+    return render(request, "booking/activity.html",
+    {
+        "activity": activity
+    })
+
+@login_required
+def schedule(request, schedule_id):
+    message = ""
+    try:
+        schedule = ActivitySchedule.objects.get(pk=schedule_id)
+        if request.method== "POST":
+            if schedule.reservations.count() < schedule.capacity:
+                schedule.reservations.add(request.user)
+            else:
+                message = "Exceded capacity"
+    except schedule.DoesNotExist:
+        raise Http404("schedule not found.")
+    return render(request, "booking/schedule.html",
+    {
+        "schedule": schedule,
+        "reserved": True if schedule.reservations.filter(activityreservation__user=request.user) else False,
+        "message": message
+    })
 
 
 @login_required

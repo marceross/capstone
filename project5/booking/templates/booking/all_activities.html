@@ -1,0 +1,14 @@
+{% extends "booking/layout.html" %}
+
+{% block body %}
+    <h2>Activities</h2>
+    <ul>
+        {% for activity in activities %}
+            <li>
+                <a href="{% url 'booking:activity' activity.id %}">
+                {{ activity.name }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

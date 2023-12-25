@@ -1,0 +1,14 @@
+{% extends "booking/layout.html" %}
+
+{% block body %}
+    <h2>{{ activity.name }}</h2>
+    <ul>
+        {% for schedule in activity.activityschedule_set.all %}
+            <li>
+                <a href="{% url 'booking:schedule' schedule.id %}">
+                {{ schedule.date }} - {{ schedule.cost }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
