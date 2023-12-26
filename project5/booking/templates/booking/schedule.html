@@ -1,0 +1,20 @@
+{% extends "booking/layout.html" %}
+
+{% block body %}
+    <h2>{{ schedule.activity.name }}</h2>
+    <h3>{{ schedule.date }}</h3>
+    Cost: ${{ schedule.cost }}
+    <br/>
+    Descritption: {{ schedule.description }}
+    <br/>
+    Capacity: {{ schedule.capacity }} ({{ schedule.reservations.count }} taken)
+    {% if not reserved %}
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" name="reserve" value="1" class="btn btn-info mb-2">Reserve</button>
+        </form>
+    {% else %}
+        <p style="color: green">Reservado!</p>
+    {% endif %}
+    <p style="color: red">{{ message }}</p>
+{% endblock %}
