@@ -17,7 +17,7 @@ from django.core.paginator import Paginator
 class NewActivity(forms.ModelForm):
     class Meta:
         model = Activity
-        exclude = ["active"]
+        exclude = ["created_by","active"]
         # Override the widget for the 'content' field
         widgets = {
             'activity': forms.Textarea(attrs={'cols': 80, 'rows': 20}),
@@ -143,19 +143,35 @@ def schedule(request, schedule_id):
         "message": message
     })
 
-
+'''
 @login_required
 def create_activity(request):
     if request.method== "POST":
-        form = NewActivity(request.POST)
+        form = NewActivity(request.POST, request.FILES)
         if form.is_valid():
             activity = form.save(commit=False)
             activity.created_by = request.user
             activity.save()
-            return  HttpResponseRedirect(reverse("booking:allactivitys"))
+            return  HttpResponseRedirect(reverse("booking:all_activities"))
         else:
             return render(request, "booking/create_activity.html", {"form": form})
     return render(request, "booking/create_activity.html", {"form": NewActivity()})
+'''
+
+def create_activity(request):
+    if request.method == 'POST':
+        form = NewActivity(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+        return redirect('booking:all_activities')
+    else:
+        form = NewActivity()
+        context = {
+            'form': form
+        }
+    return render(request, 'booking/create_activity.html', context)
+
+
 
 
 @login_required

@@ -28,7 +28,7 @@ class Activity(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='activity_owner')
     name = models.CharField(max_length=30)
     description = models.TextField()
-    image = models.ImageField()
+    image = models.ImageField(upload_to = 'images/')
     active = models.BooleanField(default=True)
 
     def __str__(self):
