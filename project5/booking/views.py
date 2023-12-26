@@ -143,7 +143,7 @@ def schedule(request, schedule_id):
         "message": message
     })
 
-'''
+
 @login_required
 def create_activity(request):
     if request.method== "POST":
@@ -156,8 +156,8 @@ def create_activity(request):
         else:
             return render(request, "booking/create_activity.html", {"form": form})
     return render(request, "booking/create_activity.html", {"form": NewActivity()})
-'''
 
+'''
 def create_activity(request):
     if request.method == 'POST':
         form = NewActivity(request.POST, request.FILES)
@@ -170,7 +170,7 @@ def create_activity(request):
             'form': form
         }
     return render(request, 'booking/create_activity.html', context)
-
+'''
 
 
 
