@@ -1,0 +1,11 @@
+{% extends "booking/layout.html" %}
+
+{% block body %}
+    <h2>{{ username }}</h2>
+    <ul>
+        {% for activityschedule in activityschedule %}
+            <li>{{ activityschedule.activity }}</li>
+            <li>{{ activityschedule.date }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

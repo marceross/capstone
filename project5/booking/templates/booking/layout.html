@@ -10,7 +10,7 @@
     <body>
 
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">booking</a>
+            <a class="navbar-brand" href="{% url 'booking:index' %}">booking</a>
           
             <div>
               <ul class="navbar-nav mr-auto">
@@ -28,12 +28,19 @@
                         <a class="nav-link" href="{% url 'booking:following' %}">Following</a>
                     </li>
                     {% endcomment %}
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'booking:agenda' %}">Agenda</a>
+                    </li>
+
+
+
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'booking:logout' %}">Log Out</a>
                     </li>
-                    <li class="nav-item">
+                    <!--<li class="nav-item">
                         <a class="nav-link btn btn-warning" href="{% url 'booking:create' %}">New Activity</a>
-                    </li>
+                    </li>-->
                 {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'booking:login' %}">Log In</a>
@@ -50,5 +57,6 @@
             {% block body %}
             {% endblock %}
         </div>
+        <script src="{% static 'booking/script.js' %}"></script>
     </body>
 </html>

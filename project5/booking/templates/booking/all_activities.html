@@ -1,15 +1,43 @@
 {% extends "booking/layout.html" %}
 
 {% block body %}
+
     <h2>Activities</h2>
-    <ul>
+    <ul style="list-style-type: none;">
         {% for activity in activities %}
+        <div style="border: 1px solid beige; margin:10px; padding: 10px">
+            <div style="display: flex; align-items: center;">
+
+                <li style="margin-right: 10px;">
+                    <a href="{% url 'booking:activity' activity.id %}" style="text-decoration: none;">
+                        <strong>{{ activity.name }}</strong>
+                    </a>
+                </li>
+            </div>
+
             <li>
-                <a href="{% url 'booking:activity' activity.id %}">
-                {{ activity.name }}
-                <img src="{{ activity.image.url }}" width= '300'/>
-                </a>
+                <img src="{{ activity.image.url }}" width= '300'>
             </li>
+            <li style="margin-right: 10px;">
+                <a href="{% url 'booking:profile' username=activity.created_by.username %}" style="text-decoration: none;"></a>
+                <strong>{{ activity.created_by }}</strong>
+            </li>
+
+            <li>
+            {% if user.is_authenticated and user.username|lower == activity.created_by.username|lower %}
+            <form action="{% url 'booking:edit' activity.id %}" method="post" class="fetch-form">
+                {% csrf_token %}
+                <textarea  style="display: none;" id="text-area-{{ activity.id }}" cols="100" rows="5" name="activity">{{ activity.description }}</textarea>
+                <a class="text-area-toggler btn btn-primary align-self-start" href="#" data-activity-id="{{ activity.id }}">Edit activity</a>
+                <button style="display: none;" type="submit" class="update btn btn-primary align-self-start" href="#" data-activity-id="{{ activity.id }}">Update activity</button>
+            </form>
+            </li>
+            
+        
+        {% endif %}
+
+        </div>
         {% endfor %}
+
     </ul>
 {% endblock %}
