@@ -8,7 +8,7 @@ from django.http import HttpResponse
 
 from django import forms
 
-from .models import ActivitySchedule, User, UserProfile, Activity
+from .models import User, UserProfile, Activity, ActivitySchedule, ActivityReservation
 from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.forms import UserChangeForm
@@ -155,15 +155,18 @@ def user_profile_view(request, username):
         #user = get_object_or_404(User, username=username)
         user = User.objects.get(username=username)
         user_profile = UserProfile.objects.get(user=user)
-        is_instructor = UserProfile.objects.get(user=user)
-        #activitys = Activity.objects.filter(created_by=user).order_by('-created_date')
+        #is_instructor = UserProfile.objects.get(user=user)
+        activities = Activity.objects.filter(created_by=user).order_by()
+        activities_schedule = ActivitySchedule.objects.filter(instructor=user)
         print()
         context = {
             'username':username,
             'user_profile': user_profile,
-            #'activitys': activitys,
+            'activitys': activities,
+            'schedule': activities_schedule,
             #'followed': followed,
-            'is instructor':is_instructor,
+            #'is instructor':is_instructor,
+
         }
 
         return render(request, 'booking/profile.html', context)
@@ -190,8 +193,9 @@ def edit_profile(request):
 
 
 def see_agenda(request):
-    activities_agenda = ActivitySchedule.objects.all()
-    return render(request, 'booking/agenda.html', {'activities': activities_agenda})
+    current_user = request.user
+    agendas = ActivityReservation.objects.filter(user=current_user)
+    return render(request, 'booking/agenda.html', {'agendas': agendas})
 
 
 def livesearch(request):

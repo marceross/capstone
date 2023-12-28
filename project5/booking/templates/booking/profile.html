@@ -7,9 +7,20 @@
 <p>Followers: {{ user_profile.followers.count }}</p>
 <p>Following: {{ user_profile.following_users.count }}</p>
 
-<h2>Activitys:</h2>
+<h2>My activities:</h2>
 {% for activity in activitys %}
     <p>{{ activity }}</p>
+    <p>{{ schedule }}</p>
+
+    {% if user.is_authenticated and user.username|lower == activity.created_by.username|lower %}
+    <form action="{% url 'booking:edit' activity.id %}" method="post" class="fetch-form">
+        {% csrf_token %}
+        <textarea  style="display: none;" id="text-area-{{ activity.id }}" cols="100" rows="5" name="activity">{{ activity.description }}</textarea>
+        <a class="text-area-toggler btn btn-primary align-self-start" href="#" data-activity-id="{{ activity.id }}">Edit activity</a>
+        <button style="display: none;" type="submit" class="update btn btn-primary align-self-start" href="#" data-activity-id="{{ activity.id }}">Update activity</button>
+    </form>
+    {% endif %}
+
 {% endfor %}
 
 {% if user_profile.is_instructor %}

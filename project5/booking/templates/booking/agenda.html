@@ -3,9 +3,23 @@
 {% block body %}
     <h2>{{ username }}</h2>
     <ul>
-        {% for activityschedule in activityschedule %}
-            <li>{{ activityschedule.activity }}</li>
-            <li>{{ activityschedule.date }}</li>
+        {% for agenda in agendas %}
+        <div style="margin: 20px;">
+            <li>{{ agenda.schedule }}</li>
+            <li>{{ agenda.timestamp }}</li>
+        </div>
+
+
+        {% if reserved %}
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" name="reserve" value="1" class="btn btn-info mb-2">Cancel</button>
+        </form>
+    {% else %}
+        <p style="color: green">Reservado!</p>
+    {% endif %}
+
+
         {% endfor %}
     </ul>
 {% endblock %}
