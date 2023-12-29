@@ -8,7 +8,7 @@
             <div>
                 <!--<p>Date: {{ agenda.schedule.date }}</p>-->
                 <!--<p>Date: {{ agenda.schedule.date|date:"F j, Y" }}</p>-->
-                <p>Time: {{ agenda.schedule.activity }}</p>
+                <p>Activity: {{ agenda.schedule.activity }}</p>
                 <p>Date: {{ agenda.schedule.date|date:"F j, Y" }}</p>
                 <p>Time: {{ agenda.schedule.date|time:"h:i A" }}</p>
                 <!--<p>Timestamp: {{ agenda.timestamp }}</p>-->
@@ -20,6 +20,20 @@
                 <button type="submit" name="action" value="cancel" class="btn btn-danger mb-2">Cancel Reservation</button>
             </form>
         </li>
+        
+<!--
+            {% if agenda.allow_cancel %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="schedule_id" value="{{ agenda.schedule.id }}">
+                    <button type="submit" name="action" value="cancel" class="btn btn-danger mb-2">Cancel Reservation</button>
+                </form>
+            {% else %}
+                <p style="color: red">{{ agenda.warning_message }}</p>
+            {% endif %}
+
+            -->
+
         {% endfor %}
     </ul>
 {% endblock %}

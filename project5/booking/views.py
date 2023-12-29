@@ -14,6 +14,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserChangeForm
 from django.contrib import messages
 
+from django.utils import timezone
+from datetime import datetime, timedelta
+
 class NewActivity(forms.ModelForm):
     class Meta:
         model = Activity
@@ -240,26 +243,32 @@ def see_agenda(request):
 
     if request.method == "POST":
         action = request.POST.get('action', '')
+        schedule_id = request.POST.get('schedule_id')
 
         if action == "cancel":
-            # User wants to cancel a reservation
-            schedule_id = request.POST.get('schedule_id')
             try:
                 schedule = ActivitySchedule.objects.get(pk=schedule_id)
-                reservation = ActivityReservation.objects.get(user=current_user, schedule=schedule)
-                reservation.delete()
+                # Make 'now' a timezone-aware datetime
+                now = timezone.now()
+                # Create a datetime object for the scheduled time on the current date
+                scheduled_datetime = datetime.combine(now.date(), schedule.date.timetz())
+                # Calculate the cancellation time limit (1 hour before the scheduled time)
+                cancellation_time_limit = scheduled_datetime - timedelta(hours=1)
+                if now < cancellation_time_limit:
+                    # Display a warning message
+                    message = "You can only cancel reservations more than one hour before the scheduled time."
+                else:
+                    # User is allowed to cancel the reservation
+                    reservation = ActivityReservation.objects.get(user=current_user, schedule=schedule)
+                    reservation.delete()
             except ActivitySchedule.DoesNotExist:
                 raise Http404("Schedule not found.")
             except ActivityReservation.DoesNotExist:
                 # Handle the case where the reservation does not exist
                 pass
-
-            # Redirect to the agenda page after canceling the reservation
+            # Redirect to the agenda page
             return redirect('booking:agenda')
-
     return render(request, 'booking/agenda.html', {'agendas': agendas})
-
-
 
 
 def livesearch(request):
