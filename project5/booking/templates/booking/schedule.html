@@ -8,6 +8,8 @@
     Descritption: {{ schedule.description }}
     <br/>
     Capacity: {{ schedule.capacity }} ({{ schedule.reservations.count }} taken)
+    
+    <!--
     {% if not reserved %}
         <form method="POST">
             {% csrf_token %}
@@ -15,6 +17,24 @@
         </form>
     {% else %}
         <p style="color: green">Reservado!</p>
-    {% endif %}
+    {% endif %}-->
+
+
+{% if not reserved %}
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" name="action" value="reserve" class="btn btn-info mb-2">Reserve</button>
+    </form>
+{% else %}
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" name="action" value="cancel" class="btn btn-danger mb-2">Cancel Reservation</button>
+    </form>
+    <p style="color: green">Reservado!</p>
+{% endif %}
+
+
+
+
     <p style="color: red">{{ message }}</p>
 {% endblock %}

@@ -4,22 +4,22 @@
     <h2>{{ username }}</h2>
     <ul>
         {% for agenda in agendas %}
-        <div style="margin: 20px;">
-            <li>{{ agenda.schedule }}</li>
-            <li>{{ agenda.timestamp }}</li>
-        </div>
+        <li style="margin-bottom: 20px;">
+            <div>
+                <!--<p>Date: {{ agenda.schedule.date }}</p>-->
+                <!--<p>Date: {{ agenda.schedule.date|date:"F j, Y" }}</p>-->
+                <p>Time: {{ agenda.schedule.activity }}</p>
+                <p>Date: {{ agenda.schedule.date|date:"F j, Y" }}</p>
+                <p>Time: {{ agenda.schedule.date|time:"h:i A" }}</p>
+                <!--<p>Timestamp: {{ agenda.timestamp }}</p>-->
+            </div>
 
-
-        {% if reserved %}
-        <form method="POST">
-            {% csrf_token %}
-            <button type="submit" name="reserve" value="1" class="btn btn-info mb-2">Cancel</button>
-        </form>
-    {% else %}
-        <p style="color: green">Reservado!</p>
-    {% endif %}
-
-
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="schedule_id" value="{{ agenda.schedule.id }}">
+                <button type="submit" name="action" value="cancel" class="btn btn-danger mb-2">Cancel Reservation</button>
+            </form>
+        </li>
         {% endfor %}
     </ul>
 {% endblock %}

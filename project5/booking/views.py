@@ -98,6 +98,7 @@ def activity(request, activity_id):
         "activity": activity
     })
 
+'''
 @login_required
 def schedule(request, schedule_id):
     message = ""
@@ -116,6 +117,40 @@ def schedule(request, schedule_id):
         "reserved": True if schedule.reservations.filter(activityreservation__user=request.user) else False,
         "message": message
     })
+    '''
+
+
+@login_required
+def schedule(request, schedule_id):
+    message = ""
+    try:
+        schedule = ActivitySchedule.objects.get(pk=schedule_id)
+        user = request.user
+
+        if request.method == "POST":
+            # Check if the user has already made a reservation
+            if schedule.reservations.filter(activityreservation__user=user).exists():
+                # User wants to cancel the reservation
+                schedule.reservations.remove(user)
+                message = "Reservation canceled successfully."
+            else:
+                # User wants to make a new reservation
+                if schedule.reservations.count() < schedule.capacity:
+                    schedule.reservations.add(user)
+                    message = "Reservation successful."
+                else:
+                    message = "Exceeded capacity"
+
+    except ActivitySchedule.DoesNotExist:
+        raise Http404("Schedule not found.")
+
+    return render(request, "booking/schedule.html", {
+        "schedule": schedule,
+        "reserved": schedule.reservations.filter(activityreservation__user=user).exists(),
+        "message": message
+    })
+
+
 
 
 @login_required
@@ -192,10 +227,39 @@ def edit_profile(request):
     return render(request, 'booking/edit_profile.html', {'form': form})
 
 
+'''def see_agenda(request):
+    current_user = request.user
+    agendas = ActivityReservation.objects.filter(user=current_user)
+    return render(request, 'booking/agenda.html', {'agendas': agendas})'''
+
+
+
 def see_agenda(request):
     current_user = request.user
     agendas = ActivityReservation.objects.filter(user=current_user)
+
+    if request.method == "POST":
+        action = request.POST.get('action', '')
+
+        if action == "cancel":
+            # User wants to cancel a reservation
+            schedule_id = request.POST.get('schedule_id')
+            try:
+                schedule = ActivitySchedule.objects.get(pk=schedule_id)
+                reservation = ActivityReservation.objects.get(user=current_user, schedule=schedule)
+                reservation.delete()
+            except ActivitySchedule.DoesNotExist:
+                raise Http404("Schedule not found.")
+            except ActivityReservation.DoesNotExist:
+                # Handle the case where the reservation does not exist
+                pass
+
+            # Redirect to the agenda page after canceling the reservation
+            return redirect('booking:agenda')
+
     return render(request, 'booking/agenda.html', {'agendas': agendas})
+
+
 
 
 def livesearch(request):
