@@ -29,6 +29,17 @@ class NewActivity(forms.ModelForm):
         labels = {
             'activity': '',
     }
+        
+
+class NewSchedule(forms.ModelForm):
+    class Meta:
+        model = ActivitySchedule
+        exclude = ["instructor", "active", "reservation", "reservations"]
+        # Override the widget for the 'content' field
+        widgets = {
+            'description': forms.Textarea(attrs={'cols': 80, 'rows': 20}),
+            'date': forms.DateInput(attrs={'type': 'date'}),
+        }
 
 
 def index(request):
@@ -185,6 +196,19 @@ def edit_activity(request, activity_id):
     else:
         edit = NewActivity(instance=activity)
         return render(request, "booking/create_activity.html", {"form": edit, "activity": activity})
+
+
+@login_required
+def create_schedule(request):
+    form = NewSchedule(request.POST or None, request.FILES or None)
+
+    if request.method == "POST" and form.is_valid():
+        activity = form.save(commit=False)
+        activity.instructor = request.user
+        activity.save()
+        return HttpResponseRedirect(reverse("booking:all_activities"))
+    
+    return render(request, "booking/create_schedule.html", {"form": form})
 
 
 @login_required

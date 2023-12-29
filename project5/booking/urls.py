@@ -16,6 +16,9 @@ urlpatterns = [
     path("schedules/<int:schedule_id>", views.schedule, name="schedule"),
 
     path("create_activity", views.create_activity, name="create"),
+    path("create_schedule", views.create_schedule, name="createtime"),
+
+
     path('profile/<str:username>', views.user_profile_view, name='profile'),
 
     path("edit/<int:activity_id>", views.edit_activity, name="edit"),

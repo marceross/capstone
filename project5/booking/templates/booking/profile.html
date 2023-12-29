@@ -25,6 +25,8 @@
 
 {% if user_profile.is_instructor %}
 <div><a class="nav-link btn btn-warning" href="{% url 'booking:create' %}">New Activity</a></div>
+
+<div><a class="nav-link btn btn-warning" href="{% url 'booking:createtime' %}">New Schedule</a></div>
 {% endif %}
 
 {% endblock %}
