@@ -12,10 +12,15 @@ from .models import User, UserProfile, Activity, ActivitySchedule, ActivityReser
 from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.forms import UserChangeForm
-from django.contrib import messages
 
 from django.utils import timezone
 from datetime import datetime, timedelta
+
+
+class UserChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name',)
 
 class NewActivity(forms.ModelForm):
     class Meta:
@@ -32,14 +37,17 @@ class NewActivity(forms.ModelForm):
         
 
 class NewSchedule(forms.ModelForm):
+    # Add a new field for time
+    time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time'}))
+
     class Meta:
         model = ActivitySchedule
         exclude = ["instructor", "active", "reservation", "reservations"]
-        # Override the widget for the 'content' field
         widgets = {
             'description': forms.Textarea(attrs={'cols': 80, 'rows': 20}),
             'date': forms.DateInput(attrs={'type': 'date'}),
         }
+        fields = ['activity', 'date', 'time', 'cost', 'capacity', 'description']
 
 
 def index(request):
@@ -205,6 +213,8 @@ def create_schedule(request):
     if request.method == "POST" and form.is_valid():
         activity = form.save(commit=False)
         activity.instructor = request.user
+        # Combine the date and time fields into the 'date' field of the model
+        activity.date = datetime.combine(form.cleaned_data['date'], form.cleaned_data['time'])
         activity.save()
         return HttpResponseRedirect(reverse("booking:all_activities"))
     
@@ -214,9 +224,10 @@ def create_schedule(request):
 @login_required
 def user_profile_view(request, username):
     if(request.user.is_authenticated):
-        #user = get_object_or_404(User, username=username)
-        user = User.objects.get(username=username)
-        user_profile = UserProfile.objects.get(user=user)
+        user = get_object_or_404(User, username=username)
+        #user = User.objects.get(username=username)
+        user_profile = get_object_or_404(UserProfile, user=user)
+        #user_profile = UserProfile.objects.get(user=user)
         #is_instructor = UserProfile.objects.get(user=user)
         activities = Activity.objects.filter(created_by=user).order_by()
         activities_schedule = ActivitySchedule.objects.filter(instructor=user)
@@ -238,7 +249,7 @@ def user_profile_view(request, username):
     
 
 #https://docs.djangoproject.com/en/5.0/ref/contrib/auth/
-@login_required
+'''@login_required
 def edit_profile(request):
     if request.method == 'POST':
         #User.objects.get()
@@ -252,6 +263,32 @@ def edit_profile(request):
     else:
         form = UserChangeForm(instance=request.user)
     return render(request, 'booking/edit_profile.html', {'form': form})
+'''
+@login_required
+def edit_profile(request):
+    user = request.user
+    if request.method == 'POST':
+        form = UserChangeForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+    else:
+        form = UserChangeForm(instance=user)
+
+    return render(request, 'edit_profile.html', {'form': form})
+
+
+@login_required
+def edit_user(request):
+    if request.method == 'POST':
+        form = UserChangeForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('profile'))  # Redirect to the user's profile page
+    else:
+        form = UserChangeForm(instance=request.user)
+
+    return render(request, 'booking/edit_user.html', {'form': form})
+
 
 
 '''def see_agenda(request):
@@ -264,6 +301,7 @@ def edit_profile(request):
 def see_agenda(request):
     current_user = request.user
     agendas = ActivityReservation.objects.filter(user=current_user)
+    message = None
 
     if request.method == "POST":
         action = request.POST.get('action', '')
@@ -272,27 +310,25 @@ def see_agenda(request):
         if action == "cancel":
             try:
                 schedule = ActivitySchedule.objects.get(pk=schedule_id)
-                # Make 'now' a timezone-aware datetime
                 now = timezone.now()
-                # Create a datetime object for the scheduled time on the current date
                 scheduled_datetime = datetime.combine(now.date(), schedule.date.timetz())
-                # Calculate the cancellation time limit (1 hour before the scheduled time)
                 cancellation_time_limit = scheduled_datetime - timedelta(hours=1)
+
                 if now < cancellation_time_limit:
-                    # Display a warning message
                     message = "You can only cancel reservations more than one hour before the scheduled time."
                 else:
-                    # User is allowed to cancel the reservation
                     reservation = ActivityReservation.objects.get(user=current_user, schedule=schedule)
                     reservation.delete()
+                    message = "Reservation canceled successfully."
+
             except ActivitySchedule.DoesNotExist:
                 raise Http404("Schedule not found.")
             except ActivityReservation.DoesNotExist:
-                # Handle the case where the reservation does not exist
                 pass
-            # Redirect to the agenda page
+
             return redirect('booking:agenda')
-    return render(request, 'booking/agenda.html', {'agendas': agendas})
+
+    return render(request, 'booking/agenda.html', {'agendas': agendas, 'message': message})
 
 
 def livesearch(request):
