@@ -1,13 +1,16 @@
 {% extends "booking/layout.html" %}
 
+
+
 {% block body %}
 
 <a href="{% url 'booking:edit_profile' %}"><strong>Edit profile</strong></a>
 <h1>{{ username }}'s Profile</h1>
-<p>Followers: {{ user_profile.followers.count }}</p>
-<p>Following: {{ user_profile.following_users.count }}</p>
+<p>Followers: {{ user_profile.followers.count | default:0}}</p>
+<p>Following: {{ user_profile.following_users.count | default:0 }}</p>
 
 <h2>My activities:</h2>
+{%if activitys %}
 {% for activity in activitys %}
     <p>{{ activity }}</p>
     <p>{{ schedule }}</p>
@@ -20,9 +23,10 @@
         <button style="display: none;" type="submit" class="update btn btn-primary align-self-start" href="#" data-activity-id="{{ activity.id }}">Update activity</button>
     </form>
     {% endif %}
-
 {% endfor %}
-
+{%else%}
+<h4>No activity found</h4>
+{% endif %}
 {% if user_profile.is_instructor %}
 <div><a class="nav-link btn btn-warning" href="{% url 'booking:create' %}">New Activity</a></div>
 
@@ -30,3 +34,4 @@
 {% endif %}
 
 {% endblock %}
+

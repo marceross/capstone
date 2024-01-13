@@ -17,7 +17,11 @@
             <form method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="schedule_id" value="{{ agenda.schedule.id }}">
-                <button type="submit" name="action" value="cancel" class="btn btn-danger mb-2">Cancel Reservation</button>
+                <button type="submit" name="action" value="cancel" class="btn btn-danger mb-2">Cancel Reservation {{ agenda.schedule.id}}</button>
+                 
+                {% if id != 0 and message and id == agenda.schedule.id%}
+                <p style="color: red">{{ message }}</p>
+                {%endif%}
             </form>
         </li>
         
@@ -34,6 +38,6 @@
 
             -->
 
-        {% endfor %}
+        {% endfor %}   
     </ul>
 {% endblock %}

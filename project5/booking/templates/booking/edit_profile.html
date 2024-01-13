@@ -1,8 +1,7 @@
 {% extends "booking/layout.html" %}
 
-
-{% block content %}
-    <h2>Edit Profile</h2>
+{% block body %}
+    <h1>Edit Profile</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
